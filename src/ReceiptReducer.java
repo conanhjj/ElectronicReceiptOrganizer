@@ -1,5 +1,6 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -20,11 +21,12 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
     @Override
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 
-        Configuration conf = new Configuration();
-        FileSystem fileSystem = FileSystem.get(conf);
-        conf.addResource(new Path("/hadoop/conf/core-site.xml"));
-        conf.addResource(new Path("/hadoop/conf/hadoop-site.xml"));
+//        Configuration conf = new Configuration();
+//        FileSystem fileSystem = FileSystem.get(conf);
+//        conf.addResource(new Path("/hadoop/conf/core-site.xml"));
+//        conf.addResource(new Path("/hadoop/conf/hadoop-site.xml"));
 
+        FileSystem fileSystem = new LocalFileSystem();
 
         Integer count = 0;
         String userId = key.toString();
