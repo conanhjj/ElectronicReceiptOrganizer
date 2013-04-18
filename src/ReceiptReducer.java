@@ -1,4 +1,5 @@
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -14,26 +15,43 @@ import java.util.Scanner;
 
 public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
+    private static String HOME_DIR = "/home/jhu14/cs525/data/";
 
     @Override
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 
         Configuration conf = new Configuration();
+        FileSystem fileSystem = FileSystem.get(conf);
         conf.addResource(new Path("/hadoop/conf/core-site.xml"));
         conf.addResource(new Path("/hadoop/conf/hadoop-site.xml"));
-        
-        Float sum = 0f;
 
+
+        Integer count = 0;
         String userId = key.toString();
-        String receiptId = values.next().toString();
-        String date = values.next().toString();
+        String receiptId, date;
 
         while(values.hasNext()) {
-            Float value = Float.valueOf(values.next().toString());
-            sum += value;
+            Text text = values.next();
+            String[] strArr = text.toString().split(" ");
+            receiptId = strArr[0];
+            date = strArr[1];
+            createDir(fileSystem, userId, receiptId, date);
+//            Path path = new Path(HOME_DIR + userId )
+            count++;
         }
 
-        output.collect(key, new Text(sum.toString()));
+        fileSystem.close();
+        output.collect(key, new Text(count.toString()));
+    }
+
+    private void createDir(FileSystem fs, String userId, String receiptId, String date) {
+        Path path = new Path(HOME_DIR + userId + "/" + receiptId);
+        try {
+            if(fs.exists(path)) return;
+            fs.mkdirs(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws Exception{
