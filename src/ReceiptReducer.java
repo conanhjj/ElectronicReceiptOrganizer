@@ -2,7 +2,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -16,29 +15,28 @@ import java.util.Scanner;
 
 public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
-    private static String HOME_DIR = "/home/jhu14/cs525/data/";
+    private static String HOME_DIR = "/cs525/data/";
 
     @Override
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 
-//        Configuration conf = new Configuration();
-//        FileSystem fileSystem = FileSystem.get(conf);
-//        conf.addResource(new Path("/hadoop/conf/core-site.xml"));
-//        conf.addResource(new Path("/hadoop/conf/hadoop-site.xml"));
+        Configuration conf = new Configuration();
+        FileSystem fileSystem = FileSystem.get(conf);
+        conf.addResource(new Path("/hadoop/conf/core-site.xml"));
+        conf.addResource(new Path("/hadoop/conf/hdfs-site.xml"));
 
-        FileSystem fileSystem = new LocalFileSystem();
+//        FileSystem fileSystem = new LocalFileSystem();
 
         Integer count = 0;
         String userId = key.toString();
-        String receiptId, date;
+        String date;
 
         while(values.hasNext()) {
             Text text = values.next();
             String[] strArr = text.toString().split(" ");
-            receiptId = strArr[0];
-            date = strArr[1];
-            createDir(fileSystem, userId, receiptId, date);
-//            Path path = new Path(HOME_DIR + userId )
+            date = strArr[0];
+            createDir(fileSystem, userId, date);
+//            Path path = new Path(HOME_DIR + userId );
             count++;
         }
 
@@ -46,8 +44,9 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
         output.collect(key, new Text(count.toString()));
     }
 
-    private void createDir(FileSystem fs, String userId, String receiptId, String date) {
-        Path path = new Path(HOME_DIR + userId + "/" + receiptId);
+    private void createDir(FileSystem fs, String userId, String dateStr) {
+        
+        Path path = new Path(HOME_DIR + userId + "/" + dateStr);
         try {
             if(fs.exists(path)) return;
             fs.mkdirs(path);

@@ -19,8 +19,10 @@ public class MainEntry {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
 
-        FileInputFormat.addInputPath(conf, new Path("/home/jhu14/cs525/input"));
-        FileOutputFormat.setOutputPath(conf, new Path("/home/jhu14/cs525/output"));
+//        FileInputFormat.addInputPath(conf, new Path("/home/jhu14/cs525/input"));
+//        FileOutputFormat.setOutputPath(conf, new Path("/home/jhu14/cs525/output"));
+        FileInputFormat.addInputPath(conf, new Path("/cs525/input"));
+        FileOutputFormat.setOutputPath(conf, new Path("/cs525/output"));
 
         conf.setMapperClass(LineIndexer.class);
         conf.setReducerClass(LineIndexerReducer.class);
@@ -43,8 +45,10 @@ public class MainEntry {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
 
-        FileInputFormat.addInputPath(conf, new Path("/home/jhu14/cs525/input"));
-        FileOutputFormat.setOutputPath(conf, new Path("/home/jhu14/cs525/output"));
+//        FileInputFormat.addInputPath(conf, new Path("/home/jhu14/cs525/input"));
+//        FileOutputFormat.setOutputPath(conf, new Path("/home/jhu14/cs525/output"));
+        FileInputFormat.addInputPath(conf, new Path("/cs525/input"));
+        FileOutputFormat.setOutputPath(conf, new Path("/cs525/output"));
 
         conf.setMapperClass(ReceiptMapper.class);
         conf.setReducerClass(ReceiptReducer.class);

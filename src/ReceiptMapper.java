@@ -4,6 +4,7 @@ import org.apache.hadoop.mapred.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
@@ -37,8 +38,6 @@ public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable,
         mapperKey.set(sb.toString());
 
         sb = new StringBuilder();
-        sb.append(unitPrice);
-        sb.append(" ");
         sb.append(receiptDate);
         mapperValue.set(sb.toString());
 
@@ -61,10 +60,6 @@ public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable,
         subTotalPrice = strArr[7];
         receiptDate = strArr[8];
         tag = strArr[9];
-
-        Integer i = 5;
-        int[] count = new int[10];
-        count[i] = 2;
     }
 
 }
