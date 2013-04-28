@@ -2,17 +2,14 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Scanner;
 
 public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
     private String receiptLineId;
     private String receiptId;
-    private String userId;
-    private String name;
+    private String userName;
+    private String itemName;
     private String store;
     private String unitPrice;
     private String quantity;
@@ -30,15 +27,31 @@ public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable,
         String line = value.toString();
         String[] strArr = line.split(",");
         loadReceipt(strArr);
+        String year = receiptDate.substring(0, 4);
+        String monthAndDay = receiptDate.substring(5);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(userId);
-//        sb.append(" ");
+        sb.append(userName);
+        sb.append(",");
+        sb.append(year);
+        sb.append(",");
+        sb.append(monthAndDay);
 //        sb.append(tag);
         mapperKey.set(sb.toString());
 
+
         sb = new StringBuilder();
-        sb.append(receiptDate);
+        sb.append(itemName);
+        sb.append(",");
+        sb.append(store);
+        sb.append(",");
+        sb.append(unitPrice);
+        sb.append(",");
+        sb.append(quantity);
+        sb.append(",");
+        sb.append(subTotalPrice);
+        sb.append(",");
+        sb.append(tag);
         mapperValue.set(sb.toString());
 
         output.collect(mapperKey, mapperValue);
@@ -52,8 +65,8 @@ public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable,
         }
         receiptLineId = strArr[0];
         receiptId = strArr[1];
-        userId = strArr[2];
-        name = strArr[3];
+        userName = strArr[2];
+        itemName = strArr[3];
         store = strArr[4];
         unitPrice = strArr[5];
         quantity = strArr[6];

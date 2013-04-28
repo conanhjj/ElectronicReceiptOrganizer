@@ -1,6 +1,6 @@
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
@@ -8,10 +8,13 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
@@ -28,25 +31,48 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
 //        FileSystem fileSystem = new LocalFileSystem();
 
         Integer count = 0;
-        String userId = key.toString();
-        String date;
+        String[] keyArr = key.toString().split(",");
+        String userName = keyArr[0];
+        String year = keyArr[1];
+        String monthAndDay = keyArr[2];
+        String dir = HOME_DIR + userName + "/" + year;
+        tryCreateDir(fileSystem, dir);
+
+        List<String> records = new LinkedList<String>();
 
         while(values.hasNext()) {
             Text text = values.next();
-            String[] strArr = text.toString().split(" ");
-            date = strArr[0];
-            createDir(fileSystem, userId, date);
-//            Path path = new Path(HOME_DIR + userId );
+//            String[] strArr = text.toString().split(",");
+//            String item = strArr[0] + " " + strArr[1];
+            String item = text.toString();
+            records.add(item);
             count++;
         }
 
-        fileSystem.close();
+        writeFile(fileSystem, dir, monthAndDay, records);
+//        fileSystem.close();
         output.collect(key, new Text(count.toString()));
     }
 
-    private void createDir(FileSystem fs, String userId, String dateStr) {
-        
-        Path path = new Path(HOME_DIR + userId + "/" + dateStr);
+    private void writeFile(FileSystem fs, String dir, String monthAndDay, List<String> records) {
+        Path path = new Path(dir +"/" + monthAndDay);
+        try {
+            FSDataOutputStream dos;
+            dos = fs.create(path);
+            for(String str : records) {
+                dos.writeChars(str+"\n");
+            }
+            dos.flush();
+            dos.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void tryCreateDir(FileSystem fs, String dir) {
+
+        Path path = new Path(dir);
         try {
             if(fs.exists(path)) return;
             fs.mkdirs(path);
@@ -56,9 +82,15 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
     }
 
     public static void main(String[] args) throws Exception{
-        Scanner in = new Scanner(new FileInputStream("receipt-joined.txt"));
-        while(in.hasNext()) {
-            System.out.println(in.nextLine());
-        }
+        String str =  "2013-03-19";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        Date date = dateFormat.parse(str);
+        System.out.println(date.toString());
+        DateFormat year = new SimpleDateFormat("yyyy");
+        DateFormat month = new SimpleDateFormat("mm");
+        DateFormat day = new SimpleDateFormat("dd");
+        System.out.println(year.format(date));
+        System.out.println(month.format(date));
+        System.out.println(day.format(date));
     }
 }
