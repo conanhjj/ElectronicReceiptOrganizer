@@ -40,7 +40,7 @@ public class IndexReducer extends MapReduceBase implements Reducer<Text, Text, T
             String date = strArr[1];
             if(tagMap.containsKey(tag)) {
                 String value = tagMap.get(tag);
-                tagMap.put(tag, value + ", " + date);
+                tagMap.put(tag, value + "," + date);
             } else {
                 tagMap.put(tag, date);
             }
@@ -49,7 +49,7 @@ public class IndexReducer extends MapReduceBase implements Reducer<Text, Text, T
         for(Map.Entry<String, String> entry : tagMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            dos.writeBytes(key + ", " + value + "\n");
+            dos.writeBytes(key + "," + value + "\n");
         }
         dos.close();
     }

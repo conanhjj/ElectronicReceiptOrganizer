@@ -16,7 +16,7 @@ public class ReceiptMapper extends MapReduceBase implements Mapper<LongWritable,
 
         String line = value.toString();
         String[] strArr = line.split(",");
-        receipt = Receipt.loadReceipt(strArr);
+        receipt = Receipt.loadRawReceipt(strArr);
         String year = receipt.receiptDate.substring(0, 4);
         String monthAndDay = receipt.receiptDate.substring(5);
 

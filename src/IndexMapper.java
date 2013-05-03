@@ -16,7 +16,7 @@ public class IndexMapper extends MapReduceBase implements Mapper<LongWritable, T
     public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         String line = value.toString();
         String[] strArr = line.split(",");
-        Receipt receipt = Receipt.loadReceipt(strArr);
+        Receipt receipt = Receipt.loadRawReceipt(strArr);
 
         StringBuilder sb = new StringBuilder();
         sb.append(receipt.userName);
