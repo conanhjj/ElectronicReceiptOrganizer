@@ -10,15 +10,13 @@ import org.apache.hadoop.mapred.Reporter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class IndexReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
 
     private static String HOME_DIR = "/cs525/data/";
 
-    private Map<String, String> tagMap = new HashMap<String, String>();
+    private Map<String, List<String>> tagMap = new HashMap<String, List<String>>();
 
     @Override
     public void reduce(Text keys, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
@@ -39,17 +37,25 @@ public class IndexReducer extends MapReduceBase implements Reducer<Text, Text, T
             String tag = strArr[0];
             String date = strArr[1];
             if(tagMap.containsKey(tag)) {
-                String value = tagMap.get(tag);
-                tagMap.put(tag, value + "," + date);
+                List<String> list = tagMap.get(tag);
+                if(!list.contains(date)) {
+                    list.add(date);
+                }
             } else {
-                tagMap.put(tag, date);
+                List<String> list = new LinkedList<String>();
+                list.add(date);
+                tagMap.put(tag, list);
             }
         }
 
-        for(Map.Entry<String, String> entry : tagMap.entrySet()) {
+        for(Map.Entry<String, List<String>> entry : tagMap.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();
-            dos.writeBytes(key + "," + value + "\n");
+            List<String> list = entry.getValue();
+            dos.writeBytes(key);
+            for(String str : list) {
+                dos.writeBytes(","+str);
+            }
+            dos.writeBytes("\n");
         }
         dos.close();
     }

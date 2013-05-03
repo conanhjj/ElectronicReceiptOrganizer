@@ -44,14 +44,28 @@ public class Receipt {
                 strArr[i] = strArr[i].substring(1, strArr[i].length()-1);
             }
         }
-        receipt.itemName = strArr[3];
-        receipt.store = strArr[4];
-        receipt.unitPrice = strArr[5];
-        receipt.quantity = strArr[6];
-        receipt.subTotalPrice = strArr[7];
-        receipt.receiptDate = strArr[8];
-        receipt.tag = strArr[9];
+        receipt.itemName = strArr[0];
+        receipt.store = strArr[1];
+        receipt.unitPrice = strArr[2];
+        receipt.quantity = strArr[3];
+        receipt.subTotalPrice = strArr[4];
+        receipt.tag = strArr[5];
 
         return receipt;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if(userName != null) {
+            sb.append(userName).append(" ");
+        }
+        sb.append(itemName).append(" ");
+        sb.append(store).append(" ");
+        sb.append(unitPrice).append(" ");
+        sb.append(quantity).append(" ");
+        sb.append(subTotalPrice).append(" ");
+        sb.append(receiptDate).append(" ");
+        sb.append(tag).append(" ");
+        return sb.toString();
     }
 }

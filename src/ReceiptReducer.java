@@ -8,6 +8,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -57,10 +58,9 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
     private void writeFile(FileSystem fs, String dir, String monthAndDay, List<String> records) {
         Path path = new Path(dir +"/" + monthAndDay);
         try {
-            FSDataOutputStream dos;
-            dos = fs.create(path);
+            DataOutputStream dos = new DataOutputStream(fs.create(path));
             for(String str : records) {
-                dos.writeChars(str+"\n");
+                dos.writeBytes(str+"\n");
             }
             dos.flush();
             dos.close();

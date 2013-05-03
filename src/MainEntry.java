@@ -1,12 +1,11 @@
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 
-import java.io.FileInputStream;
+import java.util.Scanner;
 
 public class MainEntry {
 
@@ -38,6 +37,23 @@ public class MainEntry {
         rebuildReceipt();
         buildIndex();
 
+        Scanner scanner = new Scanner(System.in);
+
+        while(true) {
+            System.out.println("Starting query");
+
+            String cmd = scanner.nextLine();
+            if(cmd.equals("quit")) break;
+            if(!cmd.equals("query")) continue;
+
+            System.out.print("User name:");
+            String userName = scanner.nextLine();
+            System.out.print("Tag:");
+            String tag = scanner.nextLine();
+
+            query(userName, tag);
+            System.out.print(QueryReducer.getResult());
+        }
     }
 
     private static void buildIndex() {
@@ -54,6 +70,34 @@ public class MainEntry {
 
         conf.setMapperClass(IndexMapper.class);
         conf.setReducerClass(IndexReducer.class);
+
+        client.setConf(conf);
+
+        try {
+            JobClient.runJob(conf);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Integer count = 0;
+
+    private static void query(String userName, String tag) {
+        JobClient client = new JobClient();
+        JobConf conf = new JobConf(ReceiptMapper.class);
+
+        conf.setJobName("Query");
+
+        conf.setOutputKeyClass(Text.class);
+        conf.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(conf, new Path("/cs525/data/" + userName + "/index"));
+        FileOutputFormat.setOutputPath(conf, new Path("/cs525/output/query" + count++));
+
+        QueryMapper.setUSERNAME(userName);
+        QueryMapper.setTAG(tag);
+        conf.setMapperClass(QueryMapper.class);
+        conf.setReducerClass(QueryReducer.class);
 
         client.setConf(conf);
 
