@@ -24,9 +24,9 @@ public class ReceiptReducer extends MapReduceBase implements Reducer<Text, Text,
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 
         Configuration conf = new Configuration();
-        FileSystem fileSystem = FileSystem.get(conf);
         conf.addResource(new Path("/hadoop/conf/core-site.xml"));
         conf.addResource(new Path("/hadoop/conf/hdfs-site.xml"));
+        FileSystem fileSystem = FileSystem.get(conf);
 
 //        FileSystem fileSystem = new LocalFileSystem();
 
